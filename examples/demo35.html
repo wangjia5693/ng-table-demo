@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <!--[if lt IE 9]>
+    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <![endif]-->
+    <script src="//cdn.bootcss.com/angular.js/1.5.8/angular.min.js"></script>
+    <script src="../dist/ng-table.js"></script>
+    <link rel="stylesheet" href="../dist/ng-table.css">
+</head>
+<body>
+
+
+
+<div ng-app="myApp" class="container-fluid" ng-controller="demoController as demo">
+    <h2 class="page-header">Custom header</h2>
+    <div class="bs-callout bs-callout-info">
+        <h4>Overview</h4>
+        <p>Out of the box ngTable renders a table header that supports grouping, sorting and filtering. You might want to supply your own header instead.</p>
+        <p><strong>Tip:</strong> The header supplied by ngTable is split into three seperate directives. You can probably replace just the part you want. You might also want to consider reusing the controller for these seperate directives and supply your own
+            html template.</p>
+    </div>
+    <table ng-table="demo.tableParams" class="table table-condensed table-bordered table-hover" template-header="customHeader.html">
+        <colgroup>
+            <col width="60%" />
+            <col width="20%" />
+            <col width="20%" />
+        </colgroup>
+        <tr class="ng-table-group" ng-repeat-start="group in $groups">
+            <td colspan="3">
+                <a href="" ng-click="group.$hideRows = !group.$hideRows">
+                    <span class="glyphicon" ng-class="{ 'glyphicon-chevron-right': group.$hideRows, 'glyphicon-chevron-down': !group.$hideRows }"></span>
+                    <strong>{{ group.value }}</strong>
+                </a>
+            </td>
+        </tr>
+        <tr ng-hide="group.$hideRows" ng-repeat="user in group.data" ng-repeat-end>
+            <td sortable="'country'" data-title="'Country'" groupable="'country'" filter="{country: 'text'}" ng-if="false">
+                {{user.country}}
+            </td>
+            <td sortable="'name'" data-title="'Name'" groupable="'name'">
+                {{user.name}}
+            </td>
+            <td sortable="'age'" data-title="'Age'" groupable="'age'">
+                {{user.age}}
+            </td>
+            <td sortable="'money'" data-title="'Money'">
+                {{user.money}}
+            </td>
+        </tr>
+    </table>
+
+    <script type="text/ng-template" id="customHeader.html">
+        <demo-custom-group-row></demo-custom-group-row>
+        <ng-table-sorter-row></ng-table-sorter-row>
+    </script>
+
+    <script type="text/ng-template" id="customGroupRow.html">
+        <tr ng-if="params.hasGroup()" ng-show="$groupRow.show" class="ng-table-group-header">
+            <th colspan="{{getVisibleColumns().length}}">
+                <ul class="nav nav-pills pull-left">
+                    <li role="presentation" ng-repeat="group in getGroupables()" ng-class="isSelectedGroup(group) ? 'active' : ''">
+                        <a href="" ng-click="groupBy(group)">
+                            <strong>{{ getGroupTitle(group)}}</strong>
+              <span ng-if="isSelectedGroup(group)" class="glyphicon" ng-class="{'glyphicon-sort-by-alphabet': params.hasGroup($selGroup, 'asc'),
+                              'glyphicon-sort-by-alphabet-alt': params.hasGroup($selGroup, 'desc')}">
+              </span>
+                        </a>
+                    </li>
+                </ul>
+                <form name="demo.searchForm" class="pull-right" novalidate ng-submit="demo.applyGlobalSearch()">
+                    <div class="input-group">
+            <span class="input-group-addon">Except for...
+                <input type="checkbox" name="inverted" ng-model="demo.isInvertedSearch" />
+              </span>
+                        <input type="text" class="form-control" placeholder="Search term" name="searchTerm" ng-model="demo.globalSearchTerm" />
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="submit" ng-disabled="demo.searchForm.$invalid">
+                    <span class="glyphicon glyphicon-search"></span>
+                </button>
+            </span>
+                    </div>
+                </form>
+            </th>
+        </tr>
+    </script>
+</div>
+
+
+
+<script>
+    angular.module("myApp", ["ngTable"]);
+    (function() {
+        "use strict";
+
+        angular.module("myApp").controller("demoController", demoController);
+
+        demoController.$inject = ["NgTableParams", "ngTableGroupedList"];
+
+        function demoController(NgTableParams) {
+            var self = this;
+            var simpleList = [ {
+
+                age: 45,
+
+                country: "Czech Republic",
+
+                money: 798,
+
+                name: "Karen"
+
+            },  {
+
+                age: 49,
+
+                country: "Czech Republic",
+
+                money: 749,
+
+                name: "Cat"
+
+            },  {
+
+                age: 48,
+
+                country: "Denmark",
+
+                money: 672,
+
+                name: "Bismark"
+
+            },  {
+
+                age: 41,
+
+                country: "Costa Rica",
+
+                money: 695,
+
+                name: "Markus"
+
+            },  {
+
+                age: 45,
+
+                country: "Japan",
+
+                money: 559,
+
+                name: "Anthony"
+
+            },  {
+
+                age: 55,
+
+                country: "Czech Republic",
+
+                money: 645,
+
+                name: "Alex"
+
+            },  {
+
+                age: 57,
+
+                country: "Japan",
+
+                money: 662,
+
+                name: "Stephane"
+
+            },  {
+
+                age: 59,
+
+                country: "American Samoa",
+
+                money: 523,
+
+                name: "Alex"
+
+            },  {
+
+                age: 56,
+
+                country: "Canada",
+
+                money: 540,
+
+                name: "Tony"
+
+            },  {
+
+                age: 57,
+
+                country: "China",
+
+                money: 746,
+
+                name: "Cat"
+
+            },  {
+
+                age: 59,
+
+                country: "Canada",
+
+                money: 572,
+
+                name: "Christian"
+
+            },  {
+
+                age: 60,
+
+                country: "Japan",
+
+                money: 649,
+
+                name: "Tony"
+
+            },  {
+
+                age: 47,
+
+                country: "Denmark",
+
+                money: 675,
+
+                name: "Cat"
+
+            },  {
+
+                age: 50,
+
+                country: "China",
+
+                money: 674,
+
+                name: "Stephane"
+
+            },  {
+
+                age: 40,
+
+                country: "Portugal",
+
+                money: 549,
+
+                name: "Markus"
+
+            },  {
+
+                age: 53,
+
+                country: "Bahamas",
+
+                money: 660,
+
+                name: "Anthony"
+
+            },  {
+
+                age: 54,
+
+                country: "China",
+
+                money: 549,
+
+                name: "Stephane"
+
+            },  {
+
+                age: 50,
+
+                country: "American Samoa",
+
+                money: 611,
+
+                name: "Karen"
+
+            },  {
+
+                age: 53,
+
+                country: "China",
+
+                money: 754,
+
+                name: "Therese"
+
+            },  {
+
+                age: 49,
+
+                country: "Canada",
+
+                money: 791,
+
+                name: "Bismark"
+
+            },  {
+
+                age: 56,
+
+                country: "Costa Rica",
+
+                money: 640,
+
+                name: "Daraek"
+
+            },  {
+
+                age: 43,
+
+                country: "Canada",
+
+                money: 674,
+
+                name: "Tony"
+
+            },  {
+
+                age: 47,
+
+                country: "Portugal",
+
+                money: 700,
+
+                name: "Karen"
+
+            },  {
+
+                age: 47,
+
+                country: "Czech Republic",
+
+                money: 718,
+
+                name: "Therese"
+
+            },  {
+
+                age: 50,
+
+                country: "Japan",
+
+                money: 655,
+
+                name: "Karen"
+
+            },  {
+
+                age: 59,
+
+                country: "American Samoa",
+
+                money: 581,
+
+                name: "Daraek"
+
+            },  {
+
+                age: 60,
+
+                country: "Portugal",
+
+                money: 595,
+
+                name: "Daraek"
+
+            },  {
+
+                age: 44,
+
+                country: "China",
+
+                money: 607,
+
+                name: "Markus"
+
+            },  {
+
+                age: 58,
+
+                country: "Japan",
+
+                money: 728,
+
+                name: "Simon"
+
+            }, {
+
+                age: 49,
+
+                country: "Bahamas",
+
+                money: 655,
+
+                name: "Simon"
+
+            }];
+            self.globalSearchTerm = "Al";
+            self.tableParams = new NgTableParams({
+                filter: { $: self.globalSearchTerm },
+                // initial grouping
+                group: "country"
+            }, {
+                dataset: simpleList
+            });
+
+            self.applyGlobalSearch = applyGlobalSearch;
+
+            function applyGlobalSearch(){
+                var term = self.globalSearchTerm;
+                if (self.isInvertedSearch){
+                    term = "!" + term;
+                }
+                self.tableParams.filter({ $: term });
+            }
+        }
+    })();
+
+    (function(){
+        angular.module("myApp").directive("demoCustomGroupRow", demoCustomGroupRow);
+
+        demoCustomGroupRow.$inject = [];
+
+        function demoCustomGroupRow(){
+            var directive = {
+                restrict: 'E',
+                replace: true,
+                templateUrl: 'customGroupRow.html',
+                scope: true,
+                controller: 'ngTableGroupRowController',
+                controllerAs: 'dctrl'
+            };
+            return directive;
+        }
+    })();
+
+    (function() {
+        "use strict";
+
+        angular.module("myApp").run(configureDefaults);
+        configureDefaults.$inject = ["ngTableDefaults"];
+
+        function configureDefaults(ngTableDefaults) {
+            ngTableDefaults.params.count = 5;
+            ngTableDefaults.settings.counts = [];
+        }
+    })();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//        var app = angular.module('main', ['ngTable']).
+//        controller('DemoCtrl', function($scope, $filter, NgTableParams) {
+//            var data = [{name: "Moroni", age: 50},
+//                {name: "Tiancum", age: 43},
+//                {name: "Jacob", age: 27},
+//                {name: "Nephi", age: 29},
+//                {name: "Enos", age: 34},
+//                {name: "Tiancum", age: 43},
+//                {name: "Jacob", age: 27},
+//                {name: "Nephi", age: 29},
+//                {name: "Enos", age: 34},
+//                {name: "Tiancum", age: 43},
+//                {name: "Jacob", age: 27},
+//                {name: "Nephi", age: 29},
+//                {name: "Enos", age: 34},
+//                {name: "Tiancum", age: 43},
+//                {name: "Jacob", age: 27},
+//                {name: "Nephi", age: 29},
+//                {name: "Enos", age: 34}];
+//            $scope.tableParams.filter = { name: 'm' }
+//            $scope.tableParams = new NgTableParams({
+//                page: 1,
+//                count: 10,          // count per page
+//            }, {
+//                total: data.length, // length of data
+//                getData: function($defer, params) {
+//                    // use build-in angular filter
+//                    var orderedData = params.filter() ?
+//                            $filter('filter')(data, params.filter()) :
+//                            data;
+//
+//                    $scope.users = orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count());
+//
+//                    params.total(orderedData.length); // set total for recalc pagination
+//                    $defer.resolve($scope.users);
+//                }
+//            });
+//
+//
+//        })
+    </script>
+
+</div>
+
+
+</body>
+</html>

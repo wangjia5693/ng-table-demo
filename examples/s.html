@@ -1,0 +1,76 @@
+<!doctype html>
+<html class="no-js" >
+<head>
+    <meta charset="utf-8">
+    <title>Angular bootstrap confirm demo</title>
+    <meta name="description" content="Angular bootstrap confirm demo">
+    <meta name="viewport" content="width=device-width">
+
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body ng-app="mwl.confirm" ng-cloak>
+
+
+
+<div
+        class="container-fluid"
+        id="demo"
+        ng-init="vm = {title: 'Are you sure?', message: 'Are you really <b>sure</b> you want to do this?', confirmText: 'Yes <i class=\'glyphicon glyphicon-ok\'></i>', cancelText: 'No <i class=\'glyphicon glyphicon-remove\'></i>'}">
+
+    <div>
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" class="form-control" ng-model="vm.title">
+        </div>
+        <div class="form-group">
+            <label>Message (Yes you can even include html!)</label>
+            <input type="text" class="form-control" ng-model="vm.message">
+        </div>
+        <div class="form-group">
+            <label>Confirm text</label>
+            <input type="text" class="form-control" ng-model="vm.confirmText">
+        </div>
+        <div class="form-group">
+            <label>Confirm text</label>
+            <input type="text" class="form-control" ng-model="vm.cancelText">
+        </div>
+        <div class="text-center">
+          <span ng-repeat="placement in ['top', 'left', 'right', 'bottom'] track by $index">
+            <button
+                    class="btn btn-default"
+                    mwl-confirm
+                    title="{{ vm.title }}"
+                    message="{{ vm.message }}"
+                    confirm-text="{{ vm.confirmText }}"
+                    cancel-text="{{ vm.cancelText }}"
+                    placement="{{ placement }}"
+                    on-confirm="vm.confirmClicked = true"
+                    on-cancel="vm.cancelClicked = true"
+                    confirm-button-type="danger"
+                    cancel-button-type="default"
+                    animation="true"
+                    ng-click="vm.confirmClicked = false; vm.cancelClicked = false">
+                Show on {{ placement }}
+            </button>
+          </span>
+        </div>
+
+        <br>
+
+        <div class="alert alert-info" ng-show="vm.confirmClicked">You clicked confirm!</div>
+        <div class="alert alert-info" ng-show="vm.cancelClicked">You cancelled!</div>
+
+    </div>
+
+</div>
+
+<script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+<script src="bower_components/angular-bootstrap-confirm/dist/angular-bootstrap-confirm.js"></script>
+<script type="text/javascript">
+    angular.module('mwl.confirm', ['mwl.confirm']);
+
+</script>>
+
+</body>
+</html>

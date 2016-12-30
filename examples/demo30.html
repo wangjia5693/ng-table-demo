@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]> <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+        <!--[if lt IE 9]>
+        <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+        <![endif]-->
+        <script src="//cdn.bootcss.com/angular.js/1.5.8/angular.min.js"></script>
+        <script src="../dist/ng-table.js"></script>
+        <link rel="stylesheet" href="../dist/ng-table.css">
+        <style type="text/css">
+            .nestedTblGutter {
+                padding-right: : 30px;
+            }
+        </style>
+    </head>
+<body ng-app="main">
+<h1>Nested tables</h1>
+
+<div ng-controller="DemoCtrl">
+
+    <p><strong>Parent Table Page:</strong> {{parentTableParams.page()}}
+    <p><strong>Parent Table Count per page:</strong> {{parentTableParams.count()}}
+    Search: <input ng-model="searchText">
+
+        <table ng-table="parentTableParams" class="table ng-table-responsive table-condensed table-hover">
+            <tbody>
+                <tr ng-repeat-start="parent in $data | filter:searchText">
+                    <td data-title="'Name'" ng-bind="parent.name"></td>
+                    <td data-title="'Age'" ng-bind="parent.age"></td>
+                    <td data-title="'Children1'">
+                        <button type="button" class="btn btn-default btn-xs" ng-click="selectedParent = (selectedParent == null ? parent : null);flag1='true';flag2='false'" ng-disabled="!parent.children1.length">
+                            <i class="glyphicon glyphicon-chevron-down" ng-hide="(selectedParent != null) && (flag2=='false')"></i>
+                            <i class="glyphicon glyphicon-chevron-up" ng-show="(selectedParent != null) && (flag2=='false')"></i>
+                        </button>
+                        <span class="badge" ng-bind="parent.children1.length || 0"></span>
+                    </td>
+                    <td data-title="'Children2'">
+                        <button type="button" class="btn btn-default btn-xs" ng-click="selectedParent = (selectedParent == null ? parent : null);flag2='true';flag1='false'" ng-disabled="!parent.children2.length">
+                            <i class="glyphicon glyphicon-chevron-down" ng-hide="(selectedParent != null) && (flag1=='false')"></i>
+                            <i class="glyphicon glyphicon-chevron-up" ng-show="(selectedParent != null) && (flag1=='false')"></i>
+                        </button>
+                        <span class="badge" ng-bind="parent.children2.length || 0"></span>
+                    </td>
+                </tr>
+                
+                <tr ng-repeat-end ng-if="(selectedParent == parent)">
+                    <td colspan="1" ng-controller="DemoChildrenCtrl" ng-if="flag1=='true'">
+                        {{flag1}}
+                        <div class="nestedTblGutter">
+                            <table ng-table="childrenTableParams" class="table ng-table-responsive table-condensed table-bordered table-hover">
+                                <tr ng-repeat="child1 in selectedParent.children1 | filter:searchText">
+                                    <td data-title="'Name'" ng-bind="child1"></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                    <td colspan="1" ng-controller="DemoChildrenCtrl" ng-if="flag2=='true'">
+                        {{flag1}}
+                        <div class="nestedTblGutter">
+                            <table ng-table="childrenTableParams" class="table ng-table-responsive table-condensed table-bordered table-hover">
+                                <tr ng-repeat="child1 in selectedParent.children2 | filter:searchText">
+                                    <td data-title="'Name'" ng-bind="child1"></td>
+                                    <!-- <td data-title="'Phone'" ng-bind="child.phone"></td> -->
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <script>
+        var app = angular.module('main', ['ngTable']).
+        controller('DemoCtrl', function($scope,$filter, ngTableParams) {
+            var data = [
+                {"age":25,"name":"Calderon Morgan","ip":"192.178.0.1","children2":["hao2","fan2","sss2"]},
+                {"age":22,"name":"Sullivan Cruz","ip":"182.190.1.1","children2":["hao2","fan2","sss2"]}
+            ];
+
+            $scope.parentTableParams = new ngTableParams({
+                page: 1,    // show first page
+                count: 10    // count per page
+            }, {
+                total: data.length,    // length of data
+                getData: function($defer, params) {
+                    $defer.resolve(data.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+                }
+            });
+
+        }).controller("DemoChildrenCtrl", function($scope, ngTableParams){
+
+            //Children Table
+            console.log("DemoChildrenCtrl");
+            $scope.childrenTableParams = new ngTableParams({
+                page: 1,    // show first page
+                count: 10    // count per page
+            }, {
+                total: 0, // length of data
+                getData: function($defer, params){
+                    $defer.resolve($scope.selectedParent.children1.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+                }
+            });
+        });
+        </script>
+
+</div>
+
+
+    </body>
+</html>

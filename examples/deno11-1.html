@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+<div ng-app="myApp" class="container-fluid">
+    <script type="text/ng-template" id="path/to/your/filters/age.html">
+        <input type="text" name="{{name}}" ng-disabled="$filterRow.disabled" ng-model="params.filter()[name]" class="input-filter form-control" maxlengh="3" angular-mask="000" placeholder="nnn" />
+    </script>
+    <script type="text/ng-template" id="path/to/your/filters/number.html">
+        <input type="text" name="{{name}}" ng-disabled="$filterRow.disabled" ng-model="params.filter()[name]" class="input-filter form-control" maxlengh="4" angular-mask="0000" placeholder="nnnn" />
+    </script>
+    <script type="text/ng-template" id="path/to/your/filters/top-countries.html">
+        <label class="radio-inline">
+            <input type="radio" ng-disabled="$filterRow.disabled" ng-model="params.filter()[name]" value="" /> <strong>None</strong>
+        </label>
+        <br />
+        <label class="radio-inline" ng-repeat="country in $column.data | limitTo:3">
+            <input type="radio" ng-disabled="$filterRow.disabled" ng-model="params.filter()[name]" ng-value="country.id" /> {{country.title}}
+        </label>
+    </script>
+
+    <div class="row">
+        <div class="col-md-6" ng-controller="demoController as demo">
+            <h3>ngTable directive</h3>
+            <table ng-table="demo.tableParams" class="table table-condensed table-bordered table-striped">
+                <tr ng-repeat="row in $data">
+                    <td data-title="'Name'" filter="{name: 'text'}">{{row.name}}</td>
+                    <td data-title="'Age'" filter="{age: 'path/to/your/filters/age.html'}">{{row.age}}</td>
+                    <td data-title="'Money'" filter="{ money: 'number'}">{{row.money}}</td>
+                    <td data-title="'Country'" filter="{ country: 'top-countries'}" filter-data="demo.countries">{{row.country}}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="col-md-6" ng-controller="dynamicDemoController as demo">
+            <h3>ngTableDynamic directive</h3>
+            <table ng-table-dynamic="demo.tableParams with demo.cols" class="table table-condensed table-bordered table-striped">
+                <tr ng-repeat="row in $data">
+                    <td ng-repeat="col in $columns">{{row[col.field]}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+
+    (function() {
+        angular.module("myApp", ["ngTable", "ngTableDemos", "angularMask"]);
+
+        angular.module("myApp").config(setConfigPhaseSettings);
+
+        setConfigPhaseSettings.$inject = ["ngTableFilterConfigProvider"];
+
+        function setConfigPhaseSettings(ngTableFilterConfigProvider) {
+            var filterAliasUrls = {
+                "top-countries": "path/to/your/filters/top-countries.html",
+                // note: ngTable also registers a 'number' filter
+                // we're overriding this alias to point to our custom template
+                "number": "path/to/your/filters/number.html"
+            };
+            ngTableFilterConfigProvider.setConfig({
+                aliasUrls: filterAliasUrls
+            });
+
+            // optionally set a default url to resolve alias names that have not been explicitly registered
+            // if you don't set one, then 'ng-table/filters/' will be used by default
+            ngTableFilterConfigProvider.setConfig({
+                defaultBaseUrl: "ng-table/filters/"
+            });
+
+        }
+    })();
+
+    (function() {
+        "use strict";
+
+        angular.module("myApp").controller("demoController", demoController);
+
+        demoController.$inject = ["NgTableParams", "ngTableSimpleMediumList", "ngTableDemoCountries"];
+
+        function demoController(NgTableParams, simpleList, countries) {
+            this.countries = countries;
+            this.tableParams = new NgTableParams({
+                filter: {
+                    country: "Andorra"
+                }
+            }, {
+                dataset: simpleList
+            });
+        }
+
+    })();
+
+    (function() {
+        "use strict";
+
+        angular.module("myApp").run(setRunPhaseDefaults);
+        setRunPhaseDefaults.$inject = ["ngTableDefaults"];
+
+        function setRunPhaseDefaults(ngTableDefaults) {
+            ngTableDefaults.params.count = 5;
+            ngTableDefaults.settings.counts = [];
+        }
+    })();
+</script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>
